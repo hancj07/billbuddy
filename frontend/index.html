@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BillBuddy 💸</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.container {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  padding: 30px;
+  border-radius: 20px;
+  width: 380px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+h1 {
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #ff7eb3;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ff4f91;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: rgba(255,255,255,0.2);
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-btn {
+  background: red;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.total {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+canvas {
+  margin-top: 20px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>BillBuddy 💸</h1>
+
+  <input type="text" id="name" placeholder="Expense Name">
+  <input type="number" id="amount" placeholder="Amount">
+
+  <button onclick="addExpense()">Add Expense</button>
+
+  <ul id="list"></ul>
+
+  <div class="total" id="total">Total: ₹0</div>
+
+  <!-- Chart -->
+  <canvas id="expenseChart" height="200"></canvas>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
