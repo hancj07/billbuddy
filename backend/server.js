@@ -1,50 +1,41 @@
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
+const pool = require("./db");
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose.connect("mongodb://127.0.0.1:27017/billbuddy")
-  .then(() => console.log("MongoDB Connected ✅"))
-  .catch(err => console.log(err));
-
-// Schema
-const expenseSchema = new mongoose.Schema({
-  name: String,
-  amount: Number,
-  date: { type: Date, default: Date.now }
-});
-
-const Expense = mongoose.model("Expense", expenseSchema);
+// Create table if not exists
+pool.query(`
+  CREATE TABLE IF NOT EXISTS expenses (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    amount NUMERIC,
+    date TIMESTAMP DEFAULT NOW()
+  )
+`);
 
 // Add Expense
 app.post("/add-expense", async (req, res) => {
   const { name, amount } = req.body;
-
-  const newExpense = new Expense({ name, amount });
-  await newExpense.save();
-
+  await pool.query("INSERT INTO expenses (name, amount) VALUES ($1, $2)", [name, amount]);
   res.json({ message: "Expense saved ✅" });
 });
 
 // Get Expenses
 app.get("/expenses", async (req, res) => {
-  const expenses = await Expense.find();
-  res.json(expenses);
+  const result = await pool.query("SELECT * FROM expenses ORDER BY date DESC");
+  res.json(result.rows);
 });
 
 // Delete Expense
 app.delete("/delete-expense/:id", async (req, res) => {
-  await Expense.findByIdAndDelete(req.params.id);
+  await pool.query("DELETE FROM expenses WHERE id = $1", [req.params.id]);
   res.json({ message: "Deleted successfully 🗑" });
 });
 
-// Start Server
 app.listen(3000, () => {
   console.log("Server running on port 3000 🚀");
 });

@@ -1,5 +1,17 @@
 let chart;
 
+// 📅 Format Date
+function formatDate(dateString) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+// ➕ Add Expense
 async function addExpense() {
   const name = document.getElementById("name").value;
   const amount = document.getElementById("amount").value;
@@ -20,6 +32,7 @@ async function addExpense() {
   loadExpenses();
 }
 
+// ❌ Delete Expense
 async function deleteExpense(id) {
   await fetch(`http://localhost:3000/delete-expense/${id}`, {
     method: "DELETE"
@@ -28,6 +41,7 @@ async function deleteExpense(id) {
   loadExpenses();
 }
 
+// 🔄 Load Expenses
 async function loadExpenses() {
   const res = await fetch("http://localhost:3000/expenses");
   const data = await res.json();
@@ -38,14 +52,22 @@ async function loadExpenses() {
   list.innerHTML = "";
   let total = 0;
 
+  data.reverse(); // latest first 🔥
+
   data.forEach(exp => {
     total += Number(exp.amount);
 
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <span>${exp.name} - ₹${exp.amount}</span>
-      <button class="delete-btn" onclick="deleteExpense('${exp._id}')">X</button>
+      <div class="expense-item">
+        <div>
+          <span>${exp.name} - ₹${exp.amount}</span>
+          <br>
+          <small>${formatDate(exp.date)}</small>
+        </div>
+        <button class="delete-btn" onclick="deleteExpense('${exp._id}')">X</button>
+      </div>
     `;
 
     list.appendChild(li);
@@ -53,14 +75,11 @@ async function loadExpenses() {
 
   totalDiv.textContent = `Total: ₹${total}`;
 
-  // 📊 Chart Data
+  // 📊 Chart
   const labels = data.map(exp => exp.name);
   const amounts = data.map(exp => exp.amount);
 
-  // Destroy old chart
-  if (chart) {
-    chart.destroy();
-  }
+  if (chart) chart.destroy();
 
   const ctx = document.getElementById("expenseChart").getContext("2d");
 
@@ -77,5 +96,5 @@ async function loadExpenses() {
   });
 }
 
-// Load on start
+// 🚀 Load on start
 loadExpenses();
