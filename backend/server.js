@@ -4,8 +4,16 @@ const pool = require("./db");
 
 const app = express();
 
+// Use the PORT provided by Render, or default to 3000 for local testing
+const PORT = process.env.PORT || 3000;
+
 app.use(cors());
 app.use(express.json());
+
+// Root Route: This fixes the "Not Found" message on the main URL
+app.get("/", (req, res) => {
+  res.send("BillBuddy API is live! 🚀");
+});
 
 // Create table if not exists
 pool.query(`
@@ -19,23 +27,39 @@ pool.query(`
 
 // Add Expense
 app.post("/add-expense", async (req, res) => {
-  const { name, amount } = req.body;
-  await pool.query("INSERT INTO expenses (name, amount) VALUES ($1, $2)", [name, amount]);
-  res.json({ message: "Expense saved ✅" });
+  try {
+    const { name, amount } = req.body;
+    await pool.query("INSERT INTO expenses (name, amount) VALUES ($1, $2)", [name, amount]);
+    res.json({ message: "Expense saved ✅" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
 });
 
 // Get Expenses
 app.get("/expenses", async (req, res) => {
-  const result = await pool.query("SELECT * FROM expenses ORDER BY date DESC");
-  res.json(result.rows);
+  try {
+    const result = await pool.query("SELECT * FROM expenses ORDER BY date DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
 });
 
 // Delete Expense
 app.delete("/delete-expense/:id", async (req, res) => {
-  await pool.query("DELETE FROM expenses WHERE id = $1", [req.params.id]);
-  res.json({ message: "Deleted successfully 🗑" });
+  try {
+    await pool.query("DELETE FROM expenses WHERE id = $1", [req.params.id]);
+    res.json({ message: "Deleted successfully 🗑" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
 });
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000 🚀");
+// Listen on the dynamic PORT
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
 });
